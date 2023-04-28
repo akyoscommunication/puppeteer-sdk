@@ -3,7 +3,11 @@
 namespace Akyos\PuppeteerSDK\Service;
 
 use Firebase\JWT\JWT;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpClient\Response\TraceableResponse;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -11,33 +15,29 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class Puppeteer
 {
     private $client;
-    private $parameterBag;
+    private $container;
 
     public function __construct(
         HttpClientInterface $client,
-        ParameterBagInterface $parameterBag
+        ContainerInterface $container
     ) {
         $this->client = $client;
-        $this->parameterBag = $parameterBag;
+        $this->container = $container;
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     */
-    public function download($url, $paramsUrl = [], $params = []): Response
+    protected function fetch($url, $paramsUrl = [], $params = []): TraceableResponse
     {
-        $endpoints = $this->parameterBag->get('puppeteer_sdk.endpoints');
-        $options = $this->parameterBag->get('puppeteer_sdk.options');
-
-        $res = new Response("Aucunes urls de renseignées.", Response::HTTP_INTERNAL_SERVER_ERROR);
+        $endpoints = $this->container->getParameter('endpoints');
+        $options = $this->container->getParameter('options');
 
         foreach ($endpoints as $endpoint) {
-
             $res = $this->client->request('GET', $endpoint, [
-                'url' => $url.'?'.http_build_query(array_merge([
-                        'token' => $this->getToken(),
-                    ], $paramsUrl)),
-                'pdf_options' => array_merge($options, $params),
+                'query' => [
+                    'url' => $url.'?'.http_build_query(array_merge([
+                            'token' => $this->getToken(),
+                        ], $paramsUrl)),
+                    'pdf_options' => array_merge($options, $params),
+                ],
             ]);
             $statusCode = $res->getStatusCode();
 
@@ -49,13 +49,52 @@ class Puppeteer
         return $res;
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
+    public function download($filename, $url, $paramsUrl = [], $params = []): Response
+    {
+        $fetch = $this->fetch($url, $paramsUrl, $params);
+        $response = $this->getResponse($fetch);
+        $response->headers->set('Content-Disposition', 'attachment;filename=' . $filename);
+
+        return $response;
+    }
+
+    public function open($filename, $url, $paramsUrl = [], $params = []): Response
+    {
+        $fetch = $this->fetch($url, $paramsUrl, $params);
+        return $this->getResponse($fetch);
+    }
+
+    public function save($output, $url, $paramsUrl = [], $params = []): File
+    {
+        $filesystem = new Filesystem();
+        $fetch = $this->fetch($url, $paramsUrl, $params);
+
+        $filesystem->dumpFile($output, $fetch->getContent());
+
+        return new File($output);
+    }
+
+    protected function getResponse($fetch): Response
+    {
+        $response = new Response($fetch->getContent());
+        $response->setStatusCode($fetch->getStatusCode());
+
+        foreach ($fetch->getHeaders() as $k => $v) {
+            $response->headers->set($k, $v);
+        }
+
+        return $response;
+    }
+
     public function getToken(): string
     {
-        $key = $this->parameterBag->get('puppeteer_sdk.token.key');
-        $algo = $this->parameterBag->get('puppeteer_sdk.token.algo');
+        $token = $this->container->getParameter('token');
 
         return JWT::encode([
             'date' => new \DateTime(),
-        ], $key, $algo);
+        ], $token['key'], $token['algo']);
     }
 }

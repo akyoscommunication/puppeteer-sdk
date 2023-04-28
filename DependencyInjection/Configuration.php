@@ -25,6 +25,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                     ->arrayNode('options')
+                        ->addDefaultsIfNotSet()
                         ->children()
                             ->scalarNode('format')->defaultValue('A4')->end()
                             ->scalarNode('printBackground')->defaultTrue()->end()

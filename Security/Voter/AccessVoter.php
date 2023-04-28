@@ -4,6 +4,7 @@ namespace Akyos\PuppeteerSDK\Security\Voter;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -13,14 +14,14 @@ class AccessVoter extends Voter
 {
     const CAN_PUPPETEER_ACCESS = 'CAN_PUPPETEER_ACCESS';
 
-    private $parameterBag;
+    private $container;
     private $requestStack;
 
     public function __construct(
-        ParameterBagInterface $parameterBag,
+        ContainerInterface $container,
         RequestStack $requestStack
     ){
-        $this->parameterBag = $parameterBag;
+        $this->container = $container;
         $this->requestStack = $requestStack;
     }
 
@@ -34,16 +35,17 @@ class AccessVoter extends Voter
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
         $now = new \DateTime();
-        $validity_time = $this->parameterBag->get('puppeteer_sdk.token.validity_time');
-        $key = $this->parameterBag->get('puppeteer_sdk.token.key');
-        $algo = $this->parameterBag->get('puppeteer_sdk.token.algo');
+        $token = $this->container->getParameter('token');
+        $validity_time = $token['validity_time'];
+        $key = $token['key'];
+        $algo = $token['algo'];
 
         $payload = JWT::decode($this->requestStack->getCurrentRequest()->get('token'), new Key($key, $algo));
+        $date = new \DateTime($payload->date->date, new \DateTimeZone($payload->date->timezone));
 
-        // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case self::CAN_PUPPETEER_ACCESS:
-                return $payload->date->add(new \DateInterval("P{$validity_time}S")) < $now;
+                return $date->add(new \DateInterval("PT{$validity_time}S")) > $now;
         }
 
         return false;
