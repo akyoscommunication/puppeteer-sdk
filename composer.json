@@ -1,0 +1,39 @@
+{
+    "name": "akyos/puppeteer-sdk",
+    "type": "sdk",
+    "description": "Symfony Puppeteer Akyos SDK",
+    "keywords": ["sdk", "puppeteer"],
+    "homepage": "https://symfony.com",
+    "license": "proprietary",
+    "authors": [
+		{
+			"name": "Lilian Carneau",
+			"email": "lilian@akyos.com"
+		},
+		{
+			"name": "Johan JOULKVA",
+			"email": "johan@akyos.com"
+		},
+		{
+			"name": "Thomas Sebert",
+			"email": "thomas@akyos.com"
+		}
+	],
+    "require": {
+        "php": ">=7.1.3",
+        "symfony/http-foundation": "4.4.*",
+        "symfony/http-client": "4.4.*",
+        "symfony/dependency-injection": "4.4.*",
+        "symfony/config": "4.4.*",
+        "symfony/security": "4.4.*",
+        "symfony/http-kernel": "4.4.*",
+        "firebase/php-jwt": "^6.4"
+    },
+    "autoload": {
+        "psr-4": { "Akyos\\PuppeteerSDK\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "stable"
+}

@@ -1,0 +1,11 @@
+services:
+    Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
+
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Akyos\PuppeteerSDK\:
+        resource: './../../*'
+        tags: [ 'controller.service_arguments' ]
+        public: true
