@@ -36,11 +36,16 @@ class AccessVoter extends Voter
     {
         $now = new \DateTime();
         $token = $this->container->getParameter('token');
+        $tokenToValidate = $this->requestStack->getCurrentRequest()->get('token');
+        if (!$tokenToValidate) {
+            return false;
+        }
+
         $validity_time = $token['validity_time'];
         $key = $token['key'];
         $algo = $token['algo'];
 
-        $payload = JWT::decode($this->requestStack->getCurrentRequest()->get('token'), new Key($key, $algo));
+        $payload = JWT::decode($tokenToValidate, new Key($key, $algo));
         $date = new \DateTime($payload->date->date, new \DateTimeZone($payload->date->timezone));
 
         switch ($attribute) {
