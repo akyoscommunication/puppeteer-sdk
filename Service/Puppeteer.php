@@ -25,7 +25,7 @@ class Puppeteer
         $this->container = $container;
     }
 
-    protected function fetch($url, $paramsUrl = [], $params = []): TraceableResponse
+    protected function fetch($url, $paramsUrl = [], $params = [])
     {
         $endpoints = $this->container->getParameter('endpoints');
         $options = $this->container->getParameter('options');
