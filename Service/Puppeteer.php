@@ -25,7 +25,7 @@ class Puppeteer
         $this->container = $container;
     }
 
-    protected function fetch($url, $paramsUrl = [], $params = [])
+    protected function fetch($url, $paramsUrl = [], $params = '')
     {
         $endpoints = $this->container->getParameter('endpoints');
         $options = $this->container->getParameter('options');
@@ -36,7 +36,7 @@ class Puppeteer
                     'url' => $url.'?'.http_build_query(array_merge([
                             'token' => $this->getToken(),
                         ], $paramsUrl)),
-                    'pdf_options' => array_merge($options, $params),
+                    'pdf_options' => $params,
                 ],
             ]);
             $statusCode = $res->getStatusCode();
