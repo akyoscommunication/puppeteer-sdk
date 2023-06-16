@@ -57,7 +57,7 @@ class Puppeteer
         $response = $this->getResponse($fetch);
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $filename));
         $response->headers->set('Content-Description', $filename);
-
+        
         return $response;
     }
 
@@ -71,11 +71,11 @@ class Puppeteer
         /**
          * Permet d'insérer le titre de la page dans le binary.
          */
-        $title = str_replace(['(', ')'], '', $customName ?: $filename);
-        $title = utf8_decode($title);
-        $updatedContent = preg_replace('/<<\/Creator/', '<</Title (' . $title . ') /Creator', $response->getContent());
+//        $title = str_replace(['(', ')'], '', $customName ?: $filename);
+//        $title = utf8_decode($title);
+//        $updatedContent = preg_replace('/<<\/Creator/', '<</Title (' . $title . ') /Creator', $response->getContent());
+//        $response->setContent($updatedContent);
 
-        $response->setContent($updatedContent);
         return $response;
     }
 

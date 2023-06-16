@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class AccessVoter extends Voter
 {
     const CAN_PUPPETEER_ACCESS = 'CAN_PUPPETEER_ACCESS';
+    const CAN_PUPPETEER_ACCESS_URL = 'CAN_PUPPETEER_ACCESS_URL';
 
     private $container;
     private $requestStack;
@@ -29,7 +30,7 @@ class AccessVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, [self::CAN_PUPPETEER_ACCESS]);
+        return in_array($attribute, [self::CAN_PUPPETEER_ACCESS, self::CAN_PUPPETEER_ACCESS_URL]);
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
@@ -45,12 +46,13 @@ class AccessVoter extends Voter
         $key = $token['key'];
         $algo = $token['algo'];
 
-        $payload = JWT::decode($tokenToValidate, new Key($key, $algo));
-        $date = new \DateTime($payload->date->date, new \DateTimeZone($payload->date->timezone));
-
         switch ($attribute) {
             case self::CAN_PUPPETEER_ACCESS:
+                $payload = JWT::decode($tokenToValidate, new Key($key, $algo));
+                $date = new \DateTime($payload->date->date, new \DateTimeZone($payload->date->timezone));
                 return $date->add(new \DateInterval("PT{$validity_time}S")) > $now;
+            case self::CAN_PUPPETEER_ACCESS_URL:
+                return $key === $tokenToValidate;
         }
 
         return false;
