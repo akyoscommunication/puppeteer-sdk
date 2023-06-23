@@ -71,10 +71,10 @@ class Puppeteer
         /**
          * Permet d'insérer le titre de la page dans le binary.
          */
-//        $title = str_replace(['(', ')'], '', $customName ?: $filename);
-//        $title = utf8_decode($title);
-//        $updatedContent = preg_replace('/<<\/Creator/', '<</Title (' . $title . ') /Creator', $response->getContent());
-//        $response->setContent($updatedContent);
+        $title = utf8_decode(str_replace(['(', ')'], '', $customName ?: $filename));
+        $updatedContent = preg_replace('/<<\/Creator/', '<</Title ('.$title.') /Creator', $response->getContent());
+        $response->setContent($updatedContent);
+        $response->headers->set('Content-length', strlen($response->getContent()));
 
         return $response;
     }
