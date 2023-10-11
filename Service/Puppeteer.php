@@ -35,7 +35,7 @@ class Puppeteer
                     'url' => $url.'?'.http_build_query(array_merge([
                             'token' => $this->getToken(),
                         ], $paramsUrl)),
-                    'pdf_options' => $params,
+                    'pdf_option' => $params,
                 ],
             ]);
             $statusCode = $res->getStatusCode();
