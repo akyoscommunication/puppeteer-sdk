@@ -51,7 +51,7 @@ class Puppeteer
     /**
      * @throws TransportExceptionInterface
      */
-    public function download($filename, $url, $paramsUrl = [], $params = []): Response
+    public function download($filename, $url, $paramsUrl = [], $params = ''): Response
     {
         $fetch = $this->fetch($url, $paramsUrl, $params);
         $response = $this->getResponse($fetch);
@@ -61,7 +61,7 @@ class Puppeteer
         return $response;
     }
 
-    public function open($filename, $url, $paramsUrl = [], $params = [], $customName = null): Response
+    public function open($filename, $url, $paramsUrl = [], $params = '', $customName = null): Response
     {
         $fetch = $this->fetch($url, $paramsUrl, $params);
         $response = $this->getResponse($fetch);
@@ -79,7 +79,7 @@ class Puppeteer
         return $response;
     }
 
-    public function save($output, $url, $paramsUrl = [], $params = []): File
+    public function save($output, $url, $paramsUrl = [], $params = ''): File
     {
         $filesystem = new Filesystem();
         $fetch = $this->fetch($url, $paramsUrl, $params);
