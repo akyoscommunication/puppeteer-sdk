@@ -10,48 +10,30 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
-/**
- * @Route("/_puppeteer", name="puppeteer_")
- * @IsGranted("CAN_PUPPETEER_ACCESS_URL")
- * @return Response
- */
+#[Route('/_puppeteer', name: 'puppeteer_')]
+#[IsGranted("CAN_PUPPETEER_ACCESS_URL")]
 class PuppeteerController extends AbstractController
 {
-    /**
-     * @Route("/show", name="show", methods={"GET"})
-     * @param Puppeteer $puppeteer
-     * @param string $filename
-     * @param string $url
-     * @param array $paramsUrl
-     * @param array|null $params
-     * @return Response
-     */
-    public function show(Puppeteer $puppeteer, ContainerInterface $container, Request $request): Response
-    {
-        $filename = $request->get('filename');
-        $url = $request->get('url');
-        $paramsUrl = $request->get('paramsUrl');
-        $params = $request->get('params');
 
-        return $puppeteer->open($filename, $url, $paramsUrl ?? [], $params ?? []);
-    }
+	#[Route('/show', name: 'show', methods: ['GET'])]
+	public function show(Puppeteer $puppeteer, ContainerInterface $container, Request $request): Response
+	{
+		$filename = $request->get('filename');
+		$url = $request->get('url');
+		$paramsUrl = $request->get('paramsUrl');
+		$params = $request->get('params');
 
-    /**
-     * @Route("/download", name="download", methods={"GET"})
-     * @param Puppeteer $puppeteer
-     * @param string $filename
-     * @param string $url
-     * @param array $paramsUrl
-     * @param array|null $params
-     * @return Response
-     */
-    public function download(Puppeteer $puppeteer, ContainerInterface $container, Request $request): Response
-    {
-        $filename = $request->get('filename');
-        $url = $request->get('url');
-        $paramsUrl = $request->get('paramsUrl');
-        $params = $request->get('params');
+		return $puppeteer->open($filename, $url, $paramsUrl ?? [], $params ?? []);
+	}
 
-        return $puppeteer->download($filename, $url, $paramsUrl ?? [], $params ?? []);
-    }
+	#[Route('/download', name: 'download', methods: ['GET'])]
+	public function download(Puppeteer $puppeteer, ContainerInterface $container, Request $request): Response
+	{
+		$filename = $request->get('filename');
+		$url = $request->get('url');
+		$paramsUrl = $request->get('paramsUrl');
+		$params = $request->get('params');
+
+		return $puppeteer->download($filename, $url, $paramsUrl ?? [], $params ?? []);
+	}
 }
